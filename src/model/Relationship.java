@@ -2,6 +2,9 @@ package model;
 
 import java.util.ArrayList;
 
+import model.Exceptions.GayException;
+import model.Exceptions.MultipleParentsException;
+
 public abstract class Relationship {
 	public Relationship(Person male, Person female) throws GayException{
 		if (male.getSex()!=Sex.Male || female.getSex()!=Sex.Female) {
@@ -15,12 +18,19 @@ public abstract class Relationship {
 	public Person getMale() {
 		return male;
 	}
+	
 	public Person getFemale() {
 		return female;
 	}
+	
 	public void AddKid(Person baby) {
-		baby.setParents(this);
-		kids.add(baby);
+		try {
+			baby.addParents(this);
+			kids.add(baby);
+		}
+		catch(MultipleParentsException e) {
+			System.err.println("This Kid named " + baby.getName()+" has other parents.");
+		}
 	}
 	private Person male;
 	private Person female;
