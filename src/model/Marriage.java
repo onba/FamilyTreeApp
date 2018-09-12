@@ -23,13 +23,15 @@ public class Marriage extends Relationship{
 	}
 	public Marriage(Person male, Person female, Date weddingDay, Date endDay) throws GayException, MarriageOutOfLifeException{
 		super(male, female);
-		if (male.getBirthDay().after(weddingDay) || female.getBirthDay().after(weddingDay) || male.getDeathDay().before(weddingDay) || female.getDeathDay().before(weddingDay)) {
+		if (male.getBirthDay().after(weddingDay) || female.getBirthDay().after(weddingDay) || (!male.isAlive() && male.getDeathDay().before(weddingDay)) || (!female.isAlive() && female.getDeathDay().before(weddingDay))) {
 			throw new MarriageOutOfLifeException("Wrong Wedding day! The Persons who goes to marriage must be alive.");
 		}
 		this.weddingDay = weddingDay;
 		
-		Date firstDeathDay = male.getDeathDay();
-		if (firstDeathDay==null || firstDeathDay.before(female.getDeathDay()))
+		Date firstDeathDay = null;
+		if (!male.isAlive())
+			firstDeathDay = male.getDeathDay();
+		if (!female.isAlive() && (firstDeathDay==null || firstDeathDay.before(female.getDeathDay())))
 			firstDeathDay = female.getDeathDay();
 		if (firstDeathDay!=null) {
 			if (endDay ==null) this.endDay = firstDeathDay;
