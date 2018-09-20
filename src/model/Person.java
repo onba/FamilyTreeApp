@@ -7,9 +7,13 @@ import model.Exceptions.GayException;
 import model.Exceptions.MultipleParentsException;
 
 public class Person {
+	
 	public Person(Sex sex, String name, Date birthDay) {
 		this(sex,name,birthDay,null,null);
 	}
+	
+	private int level; //level in the familyTree
+	
 	public Person(Sex sex, String name, Date birthDay, Date deathDay, Relationship parents) {
 		this.sex = sex;
 		this.name = name==null ? "John Doe" : name;
@@ -17,7 +21,14 @@ public class Person {
 		this.deathDay = deathDay;
 		if (parents!=null)
 			parents.AddKid(this);
-		partners = new ArrayList<Relationship>();
+		relationShips = new ArrayList<Relationship>();
+		level = -1;
+	}
+	public int getLevel() {
+		return level;
+	}
+	public void setLevel(int level) {
+		this.level = level;
 	}
 	public Sex getSex() {
 		return sex;
@@ -25,9 +36,21 @@ public class Person {
 	public Relationship getParents() {
 		return parents;
 	}
-	public void wed(Relationship rs){
-		partners.add(rs);
+	public int subTreeWidth(int width) {
+		ArrayList<Person> lowerLevel = getLowerLevel();
+		
+		if (lowerLevel.size()>width) width=lowerLevel.size();
+		for (Person lowerPerson : lowerLevel) {
+			int lowerWidth = lowerPerson.subTreeWidth(width);
+			if (lowerWidth>width) width = lowerWidth;
+		}
+		return  width;
 	}
+	
+	public void wed(Relationship rs){
+		relationShips.add(rs);
+	}
+	
 	public void addParents(Relationship parents) throws MultipleParentsException{
 		if(this.parents==null || this.parents.equals(parents)) {
 			this.parents = parents;
@@ -36,12 +59,34 @@ public class Person {
 			throw new MultipleParentsException("This Person already has parents");
 		}
 	}
-	public ArrayList<Relationship> getPartners() {
-		return partners;
+	
+	public ArrayList<Relationship> getRelationShips() {
+		return relationShips;
 	}
+	
+	public ArrayList<Person> getPartners(){
+		ArrayList<Person> res = new ArrayList<Person>();
+		for(Relationship rel : relationShips) {
+			if (sex == Sex.Male)
+				res.add(rel.getFemale());
+			else
+				res.add(rel.getMale());
+		}
+		return res;
+	}
+	
 	public String getName() {
 		return name;
 	}
+	
+	public Person geMalePrimogenitor() {
+		Person per = this;
+		while(per!=null) {
+			per = per.getDaddy();
+		}
+		return per;
+	}
+	
 	public Person getDaddy() {
 		if (parents==null) {
 			return null;
@@ -54,6 +99,18 @@ public class Person {
 			}
 		return parents.getFemale();
 		}
+	public ArrayList<Person> getLowerLevel(){
+		ArrayList<Person> lowerLevel = new ArrayList<Person>();
+		for(Relationship rel : relationShips) {
+			for (Person kid :rel.getKids()) {
+				lowerLevel.add(kid);
+				for (Person partner : kid.getPartners()) {
+					lowerLevel.add(partner);
+				}
+			}
+		}
+		return lowerLevel;
+	}
 	public int getUpperLevels(int previousLevels) {
 		if (parents == null) return previousLevels;
 		++previousLevels;
@@ -62,7 +119,7 @@ public class Person {
 		return motherLevels>fatherLevels ? motherLevels : fatherLevels;
 	}
 	public boolean hasChild() {
-		for(Relationship rel : partners) {
+		for(Relationship rel : relationShips) {
 			if (rel.getKids()!=null) {
 				return true;
 			}
@@ -86,6 +143,6 @@ public class Person {
 	private Date deathDay;
 	private Sex sex;
 	private Relationship parents;
-	private ArrayList<Relationship> partners;
+	private ArrayList<Relationship> relationShips;
 	
 }

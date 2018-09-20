@@ -14,6 +14,8 @@ public abstract class Relationship {
 		female.wed(this);
 		this.male = male;
 		this.female = female;
+		if (male.getLevel()<female.getLevel()) male.setLevel(female.getLevel());
+		else female.setLevel(male.getLevel());
 		kids = new ArrayList<Person>();
 	}
 	public abstract String getName();
@@ -28,6 +30,14 @@ public abstract class Relationship {
 		if (kids.size()==0) return null;
 		return kids;
 	}
+	public int childrenCount() {
+		int count = 0;
+		for(Person per : kids) {
+			count+=per.getPartners().size()+1;
+		}
+		return count;
+	}
+	
 	public void AddKid(Person baby) {
 		try {
 			baby.addParents(this);
