@@ -24,6 +24,9 @@ public class Person {
 		relationShips = new ArrayList<Relationship>();
 		level = -1;
 	}
+	/*public boolean isAlone() {
+		return relationShips.
+	}*/
 	public int getLevel() {
 		return level;
 	}
@@ -123,6 +126,12 @@ public class Person {
 			if (rel.getKids()!=null) {
 				return true;
 			}
+		}
+		return false;
+	}
+	public boolean hasActiveRelationShip() {
+		for(Relationship rs : getRelationShips()) {
+			if(rs.getActive()) return true;
 		}
 		return false;
 	}

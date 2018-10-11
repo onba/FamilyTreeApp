@@ -10,6 +10,7 @@ public abstract class Relationship {
 		if (male.getSex()!=Sex.Male || female.getSex()!=Sex.Female) {
 			throw new GayException("Can't be relationship between Persons with the same Sex: "+male.getName()+", "+female.getName());
 		}
+		active = true;
 		male.wed(this);
 		female.wed(this);
 		this.male = male;
@@ -25,6 +26,9 @@ public abstract class Relationship {
 	
 	public Person getFemale() {
 		return female;
+	}
+	public boolean getActive() {
+		return active;
 	}
 	public ArrayList<Person> getKids(){
 		if (kids.size()==0) return null;
@@ -50,5 +54,6 @@ public abstract class Relationship {
 	private Person male;
 	private Person female;
 	private ArrayList<Person> kids;
+	protected boolean active;
 	
 }
